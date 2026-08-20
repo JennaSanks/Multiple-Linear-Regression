@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Uber — Fare Prediction</title>
+
+
+<style>
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* ============================================================
+   ROOT
+   ============================================================ */
+
+:root {
+
+    --bg: #080808;
+
+    --surface: #111111;
+
+    --surface-2: #161616;
+
+    --text: #f2f2f2;
+
+    --muted: #858585;
+
+    --border: rgba(255,255,255,0.12);
+
+    --accent: #ff5c35;
+
+    --accent-light: #ff8a70;
+
+}
+
+
+/* ============================================================
+   BODY
+   ============================================================ */
+
+body {
+
+    background: var(--bg);
+
+    color: var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+}
+
+
+/* ============================================================
+   BACKGROUND GRID
+   ============================================================ */
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: 0.08;
+
+    background-image:
+
+        linear-gradient(
+            rgba(255,255,255,0.3) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,0.3) 1px,
+            transparent 1px
+        );
+
+    background-size: 80px 80px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent
+        );
+
+}
+
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+
+.navbar {
+
+    height: 80px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 5vw;
+
+    position: relative;
+
+    z-index: 10;
+
+}
+
+
+.logo {
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+}
+
+
+.logo span {
+
+    color: var(--accent);
+
+}
+
+
+.nav-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 11px;
+
+    color: var(--muted);
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+}
+
+
+.status-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #66e38c;
+
+    box-shadow:
+        0 0 12px rgba(102,227,140,0.7);
+
+}
+
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+
+    min-height: 58vh;
+
+    padding:
+        9vh 5vw
+        7vh;
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr 0.5fr;
+
+    gap: 40px;
+
+    border-bottom:
+        1px solid var(--border);
+
+}
+
+
+.hero-left {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+}
+
+
+.eyebrow {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: var(--accent);
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 25px;
+
+}
+
+
+h1 {
+
+    font-size:
+        clamp(70px, 12vw, 190px);
+
+    line-height: 0.82;
+
+    letter-spacing: -0.08em;
+
+    font-weight: 800;
+
+    max-width: 1000px;
+
+}
+
+
+.hero-description {
+
+    margin-top: 35px;
+
+    max-width: 550px;
+
+    color: var(--muted);
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+}
+
+
+.hero-right {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+    align-items: flex-end;
+
+}
+
+
+.hero-number {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 12px;
+
+    color: var(--muted);
+
+    margin-bottom: 12px;
+
+}
+
+
+.hero-line {
+
+    width: 100%;
+
+    max-width: 220px;
+
+    height: 1px;
+
+    background:
+        var(--border);
+
+}
+
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+.main {
+
+    display: grid;
+
+    grid-template-columns:
+        0.45fr 1.55fr;
+
+    min-height: 600px;
+
+    border-bottom:
+        1px solid var(--border);
+
+}
+
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.sidebar {
+
+    border-right:
+        1px solid var(--border);
+
+    padding: 40px 5vw;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+}
+
+
+.sidebar-label {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1.5px;
+
+}
+
+
+.sidebar-title {
+
+    font-size: 34px;
+
+    line-height: 1;
+
+    letter-spacing: -0.04em;
+
+}
+
+
+.sidebar-bottom {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 11px;
+
+    color: var(--muted);
+
+    line-height: 1.8;
+
+}
+
+
+/* ============================================================
+   FORM AREA
+   ============================================================ */
+
+.form-area {
+
+    padding: 50px 5vw;
+
+}
+
+
+.form-header {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    padding-bottom: 25px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    margin-bottom: 30px;
+
+}
+
+
+.form-header h2 {
+
+    font-size: 32px;
+
+    letter-spacing: -0.04em;
+
+}
+
+
+.form-header span {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+}
+
+
+/* ============================================================
+   FORM GRID
+   ============================================================ */
+
+.form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 0 30px;
+
+}
+
+
+.field {
+
+    margin-bottom: 25px;
+
+}
+
+
+.field label {
+
+    display: block;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 10px;
+
+    color: var(--muted);
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 9px;
+
+}
+
+
+.field input {
+
+    width: 100%;
+
+    height: 48px;
+
+    background:
+        transparent;
+
+    border: none;
+
+    border-bottom:
+        1px solid #333;
+
+    color: var(--text);
+
+    outline: none;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.25s ease;
+
+}
+
+
+.field input:focus {
+
+    border-bottom-color:
+        var(--accent);
+
+}
+
+
+.field input::placeholder {
+
+    color: #4d4d4d;
+
+}
+
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+.predict-button {
+
+    margin-top: 10px;
+
+    width: 100%;
+
+    height: 62px;
+
+    background: var(--accent);
+
+    color: #080808;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+
+    text-transform: uppercase;
+
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease;
+
+}
+
+
+.predict-button:hover {
+
+    background:
+        var(--accent-light);
+
+    transform:
+        translateY(-3px);
+
+}
+
+
+.predict-button:active {
+
+    transform:
+        translateY(0);
+
+}
+
+
+/* ============================================================
+   RESULT
+   ============================================================ */
+
+.result-section {
+
+    border-bottom:
+        1px solid var(--border);
+
+    padding:
+        70px 5vw;
+
+    background:
+        #0b0b0b;
+
+}
+
+
+.result-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+
+}
+
+
+.result-label {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: var(--accent);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+
+}
+
+
+.result-code {
+
+    color: var(--muted);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 11px;
+
+}
+
+
+.result-value {
+
+    font-size:
+        clamp(70px, 12vw, 180px);
+
+    line-height: 0.9;
+
+    letter-spacing: -0.08em;
+
+    font-weight: 800;
+
+    color: var(--text);
+
+}
+
+
+.distance {
+
+    margin-top: 25px;
+
+    color: var(--muted);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 12px;
+
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.error {
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border: 1px solid #6b3025;
+
+    color: #ff8a70;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 12px;
+
+}
+
+
+/* ============================================================
+   INFO SECTION
+   ============================================================ */
+
+.info {
+
+    padding:
+        80px 5vw;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    gap: 1px;
+
+    background:
+        var(--border);
+
+}
+
+
+.info-card {
+
+    background:
+        var(--bg);
+
+    padding: 35px;
+
+    min-height: 190px;
+
+}
+
+
+.info-number {
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: var(--accent);
+
+    font-size: 11px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.info-card h3 {
+
+    font-size: 24px;
+
+    margin-bottom: 12px;
+
+    letter-spacing: -0.03em;
+
+}
+
+
+.info-card p {
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+footer {
+
+    padding:
+        30px 5vw;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    color: var(--muted);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+}
+
+
+.footer-accent {
+
+    color: var(--accent);
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    .hero {
+
+        grid-template-columns: 1fr;
+
+        min-height: auto;
+
+        padding-top: 70px;
+
+        padding-bottom: 70px;
+
+    }
+
+
+    .hero-right {
+
+        align-items: flex-start;
+
+    }
+
+
+    .main {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .sidebar {
+
+        border-right: none;
+
+        border-bottom:
+            1px solid var(--border);
+
+        min-height: 260px;
+
+    }
+
+
+    .form-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .info {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .navbar {
+
+        height: 65px;
+
+    }
+
+
+    .nav-right {
+
+        display: none;
+
+    }
+
+
+    h1 {
+
+        font-size:
+            clamp(65px, 22vw, 110px);
+
+    }
+
+
+    .form-area {
+
+        padding:
+            35px 25px;
+
+    }
+
+
+    .sidebar {
+
+        padding:
+            35px 25px;
+
+    }
+
+
+    .hero {
+
+        padding:
+            65px 25px;
+
+    }
+
+
+    .result-section {
+
+        padding:
+            55px 25px;
+
+    }
+
+
+    .result-value {
+
+        font-size:
+            75px;
+
+    }
+
+
+    .info {
+
+        padding:
+            50px 25px;
+
+    }
+
+
+    footer {
+
+        padding:
+            25px;
+
+        flex-direction: column;
+
+        gap: 10px;
+
+        align-items: flex-start;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        UBER<span>/</span>ML
+    </div>
+
+    <div class="nav-right">
+
+        <span class="status-dot"></span>
+
+        MODEL ONLINE
+
+    </div>
+
+</nav>
+
+
+<!-- ========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="hero-left">
+
+        <div class="eyebrow">
+            Regression / 001
+        </div>
+
+        <h1>
+            FARE<br>
+            PREDICT.
+        </h1>
+
+        <p class="hero-description">
+
+            A machine learning system that estimates
+            ride fares from trip characteristics using
+            Multiple Linear Regression.
+
+        </p>
+
+    </div>
+
+
+    <div class="hero-right">
+
+        <div class="hero-number">
+            40.7128° N / 74.0060° W
+        </div>
+
+        <div class="hero-line"></div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     MAIN PREDICTION AREA
+========================================================= -->
+
+<section class="main">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div>
+
+            <div class="sidebar-label">
+                Input / 07
+            </div>
+
+            <div class="sidebar-title">
+                Trip<br>
+                Data
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            MODEL<br>
+            MULTIPLE LINEAR REGRESSION
+
+            <br><br>
+
+            TARGET<br>
+            FARE_AMOUNT
+
+        </div>
+
+    </aside>
+
+
+    <!-- FORM -->
+
+    <main class="form-area">
+
+        <div class="form-header">
+
+            <h2>
+                Enter trip details
+            </h2>
+
+            <span>
+                REQUIRED FIELDS *
+            </span>
+
+        </div>
+
+
+        <form
+            action="/predict"
+            method="POST"
+        >
+
+
+            <div class="form-grid">
+
+
+                <!-- PASSENGERS -->
+
+                <div class="field">
+
+                    <label>
+                        Passenger Count
+                    </label>
+
+                    <input
+                        type="number"
+                        name="passenger_count"
+                        min="1"
+                        max="6"
+                        step="1"
+                        placeholder="02"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- HOUR -->
+
+                <div class="field">
+
+                    <label>
+                        Pickup Hour
+                    </label>
+
+                    <input
+                        type="number"
+                        name="hour"
+                        min="0"
+                        max="23"
+                        placeholder="18"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PICKUP LATITUDE -->
+
+                <div class="field">
+
+                    <label>
+                        Pickup Latitude
+                    </label>
+
+                    <input
+                        type="number"
+                        name="pickup_latitude"
+                        step="0.000001"
+                        placeholder="40.7580"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PICKUP LONGITUDE -->
+
+                <div class="field">
+
+                    <label>
+                        Pickup Longitude
+                    </label>
+
+                    <input
+                        type="number"
+                        name="pickup_longitude"
+                        step="0.000001"
+                        placeholder="-73.9855"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DROPOFF LATITUDE -->
+
+                <div class="field">
+
+                    <label>
+                        Drop-off Latitude
+                    </label>
+
+                    <input
+                        type="number"
+                        name="dropoff_latitude"
+                        step="0.000001"
+                        placeholder="40.7484"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DROPOFF LONGITUDE -->
+
+                <div class="field">
+
+                    <label>
+                        Drop-off Longitude
+                    </label>
+
+                    <input
+                        type="number"
+                        name="dropoff_longitude"
+                        step="0.000001"
+                        placeholder="-73.9857"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DAY -->
+
+                <div class="field">
+
+                    <label>
+                        Day
+                    </label>
+
+                    <input
+                        type="number"
+                        name="day"
+                        min="1"
+                        max="31"
+                        placeholder="15"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- MONTH -->
+
+                <div class="field">
+
+                    <label>
+                        Month
+                    </label>
+
+                    <input
+                        type="number"
+                        name="month"
+                        min="1"
+                        max="12"
+                        placeholder="08"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- YEAR -->
+
+                <div class="field">
+
+                    <label>
+                        Year
+                    </label>
+
+                    <input
+                        type="number"
+                        name="year"
+                        min="2009"
+                        max="2015"
+                        placeholder="2015"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- WEEKDAY -->
+
+                <div class="field">
+
+                    <label>
+                        Weekday
+                    </label>
+
+                    <input
+                        type="number"
+                        name="weekday"
+                        min="0"
+                        max="6"
+                        placeholder="5"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="predict-button"
+            >
+
+                Calculate Fare →
+
+            </button>
+
+
+        </form>
+
+
+        {% if error_text %}
+
+        <div class="error">
+
+            {{ error_text }}
+
+        </div>
+
+        {% endif %}
+
+    </main>
+
+</section>
+
+
+<!-- ========================================================
+     RESULT
+========================================================= -->
+
+{% if prediction_text %}
+
+<section class="result-section">
+
+    <div class="result-top">
+
+        <span class="result-label">
+            Prediction / Complete
+        </span>
+
+        <span class="result-code">
+            MLR_001
+        </span>
+
+    </div>
+
+
+    <div class="result-value">
+
+        {{ prediction_text }}
+
+    </div>
+
+
+    {% if distance_text %}
+
+    <div class="distance">
+
+        TRIP DISTANCE / {{ distance_text }}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endif %}
+
+
+<!-- ========================================================
+     INFORMATION
+========================================================= -->
+
+<section class="info">
+
+
+    <div class="info-card">
+
+        <div class="info-number">
+            01 / DATA
+        </div>
+
+        <h3>
+            Trip features
+        </h3>
+
+        <p>
+
+            Passenger count, geographic coordinates,
+            trip distance and pickup time are used
+            as model inputs.
+
+        </p>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <div class="info-number">
+            02 / MODEL
+        </div>
+
+        <h3>
+            Linear regression
+        </h3>
+
+        <p>
+
+            Multiple independent variables are used
+            to estimate one continuous numerical
+            target: the ride fare.
+
+        </p>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <div class="info-number">
+            03 / OUTPUT
+        </div>
+
+        <h3>
+            Estimated fare
+        </h3>
+
+        <p>
+
+            The trained model returns an estimated
+            Uber fare based on the trip information
+            provided above.
+
+        </p>
+
+    </div>
+
+
+</section>
+
+
+<!-- ========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <span>
+        Uber Fare Prediction
+    </span>
+
+    <span class="footer-accent">
+        Multiple Linear Regression
+    </span>
+
+    <span>
+        ML / FLASK
+    </span>
+
+</footer>
+
+
+</body>
+
+</html>
